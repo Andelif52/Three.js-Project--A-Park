@@ -3,7 +3,7 @@ import { createPark } from "./park.js";
 import { setupControls } from "./controls.js";
 import { loadLeafShaders, createTrees } from "./tree.js";
 import { createPetals } from "./petals.js";
-
+import { createSun } from "./sun.js";
 // ---------- Scene ----------
 
 const scene = new THREE.Scene();
@@ -78,11 +78,16 @@ const park = createPark(scene);
 const leafShaders = await loadLeafShaders();
 const trees = createTrees(scene, leafShaders);
 const petals = createPetals(scene, trees.placements);
+// ---------- Sun ----------
+
+const sun = createSun(scene, sunlight, hemiLight);
 // ---------- Controls ----------
-
-const controls = setupControls(camera, new THREE.Vector3(0, 0.6, 0));
-
-
+const controls = setupControls(
+    camera,
+    renderer.domElement,
+    new THREE.Vector3(0, 0.6, 0), // orbit around the bench
+    sun
+);
 // ---------- Animation loop ----------
 
 const clock = new THREE.Clock();
@@ -93,6 +98,7 @@ function animate() {
 
     controls.update(delta);
     park.update(delta, elapsed);
+    sun.update(delta);
     trees.update(elapsed, sunlight, hemiLight);
     petals.update(delta, elapsed, trees.leafMaterial.uniforms.uSeason.value);
     renderer.render(scene, camera);

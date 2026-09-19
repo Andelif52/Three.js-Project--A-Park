@@ -349,3 +349,22 @@ export function createPetalTexture() {
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
 }
+// ---------- Sun glow ----------
+
+export function createSunGlowTexture() {
+    const size = 128;
+    const { canvas, ctx } = makeCanvas(size);
+
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+    gradient.addColorStop(0.15, "rgba(255, 250, 230, 1)");
+    gradient.addColorStop(0.3, "rgba(255, 230, 180, 0.5)");
+    gradient.addColorStop(1, "rgba(255, 200, 150, 0)");
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+}
