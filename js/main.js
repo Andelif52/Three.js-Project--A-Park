@@ -1,139 +1,105 @@
-import * as THREE from 
-"https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
-
+import * as THREE from "three";
 import { createPark } from "./park.js";
 import { setupControls } from "./controls.js";
 
 
-// Scene
+// ---------- Scene ----------
 
 const scene = new THREE.Scene();
 
-scene.background = new THREE.Color(0x87ceeb);
+const skyColor = new THREE.Color(0xcfe6ee);
+scene.background = skyColor;
+scene.fog = new THREE.Fog(skyColor, 30, 85); // starts fading at 30, fully hidden at 85
 
 
-// Camera
+// ---------- Camera ----------
 
 const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth/window.innerHeight,
+    60,
+    window.innerWidth / window.innerHeight,
     0.1,
-    1000
+    200
 );
 
-
-camera.position.set(
-    0,
-    5,
-    10
-);
+camera.position.set(0, 6, 14);
 
 
-// Renderer
+// ---------- Renderer ----------
 
-const renderer = new THREE.WebGLRenderer({
-    antialias:true
-});
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-
-renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-);
-
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 renderer.shadowMap.enabled = true;
-
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
 
+// ---------- Lighting ----------
 
-// Lighting
+// Soft fill light: sky tone from above, grass tone from below
+const hemiLight = new THREE.HemisphereLight(0xdcefff, 0x5b7a3a, 1.4);
+scene.add(hemiLight);
 
-const ambient = new THREE.AmbientLight(
-    0xffffff,
-    0.5
-);
+// Sun
+const sunlight = new THREE.DirectionalLight(0xfff0d6, 2.8);
+sunlight.position.set(15, 20, 10);
+sunlight.castShadow = true;
 
-scene.add(ambient);
+sunlight.shadow.mapSize.set(2048, 2048);
 
+const shadowCam = sunlight.shadow.camera;
+shadowCam.left = -30;
+shadowCam.right = 30;
+shadowCam.top = 30;
+shadowCam.bottom = -30;
+shadowCam.near = 1;
+shadowCam.far = 80;
+shadowCam.updateProjectionMatrix();
 
-
-const sunlight = new THREE.DirectionalLight(
-    0xffffff,
-    1
-);
-
-
-sunlight.position.set(
-    10,
-    20,
-    10
-);
-
-
-sunlight.castShadow=true;
+sunlight.shadow.bias = -0.0005;     // prevents stripy "shadow acne"
+sunlight.shadow.normalBias = 0.02;
 
 scene.add(sunlight);
+scene.add(sunlight.target); // the point the sun shines toward (origin)
+
+// Uncomment to see the shadow area as a wireframe box while debugging:
+// scene.add(new THREE.CameraHelper(shadowCam));
 
 
+// ---------- Park ----------
+
+const park = createPark(scene);
 
 
-// Create park
+// ---------- Controls ----------
 
-const parkObjects = createPark(scene);
-
-
-
-// Controls
-
-setupControls(camera);
+const controls = setupControls(camera, new THREE.Vector3(0, 0.6, 0));
 
 
+// ---------- Animation loop ----------
 
+const clock = new THREE.Clock();
 
-// Animation
+function animate() {
+    const delta = Math.min(clock.getDelta(), 0.1);
+    const elapsed = clock.elapsedTime;
 
-function animate(){
+    controls.update(delta);
+    park.update(delta, elapsed);
 
-    requestAnimationFrame(animate);
-
-
-    // sunlight movement placeholder
-
-    sunlight.position.x =
-        Math.sin(Date.now()*0.001)*20;
-
-
-    renderer.render(
-        scene,
-        camera
-    );
-
+    renderer.render(scene, camera);
 }
 
-
-animate();
-
+renderer.setAnimationLoop(animate);
 
 
+// ---------- Resize ----------
 
-// Resize
-
-window.addEventListener(
-"resize",
-()=>{
-
-camera.aspect =
-window.innerWidth/window.innerHeight;
-
-camera.updateProjectionMatrix();
-
-
-renderer.setSize(
-window.innerWidth,
-window.innerHeight
-);
-
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 });
