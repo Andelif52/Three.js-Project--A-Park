@@ -368,3 +368,53 @@ export function createSunGlowTexture() {
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
 }
+// ---------- Pastel paint (playground equipment) ----------
+
+export function createPaintTexture(color) {
+    const size = 128;
+    const { canvas, ctx } = makeCanvas(size);
+
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, size, size);
+
+    // Slightly uneven paint
+    drawBlotches(
+        ctx, size, 15, 8, 30,
+        "rgba(255, 255, 255, 0.15)",
+        "rgba(0, 0, 0, 0.08)"
+    );
+
+    // Tiny light speckles
+    ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+    for (let i = 0; i < 300; i++) {
+        ctx.beginPath();
+        ctx.arc(rand(0, size), rand(0, size), rand(0.4, 1), 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    return toTexture(canvas, 1, 1);
+}
+
+
+// ---------- Rope (swing ropes) ----------
+
+export function createRopeTexture() {
+    const width = 32;
+    const height = 128;
+    const { canvas, ctx } = makeCanvas(width, height);
+
+    ctx.fillStyle = "#d8c29a";
+    ctx.fillRect(0, 0, width, height);
+
+    // Diagonal strands for a twisted look
+    ctx.strokeStyle = "rgba(120, 95, 60, 0.6)";
+    ctx.lineWidth = 2;
+    for (let y = -32; y < height; y += 8) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y + 16);
+        ctx.stroke();
+    }
+
+    return toTexture(canvas, 1, 4);
+}

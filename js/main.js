@@ -4,6 +4,7 @@ import { setupControls } from "./controls.js";
 import { loadLeafShaders, createTrees } from "./tree.js";
 import { createPetals } from "./petals.js";
 import { createSun } from "./sun.js";
+import { createPlayground } from "./playground.js";
 // ---------- Scene ----------
 
 const scene = new THREE.Scene();
@@ -73,6 +74,7 @@ scene.add(sunlight.target); // the point the sun shines toward (origin)
 // ---------- Park ----------
 
 const park = createPark(scene);
+const playground = createPlayground(scene);
 // ---------- Trees ----------
 
 const leafShaders = await loadLeafShaders();
@@ -98,6 +100,7 @@ function animate() {
 
     controls.update(delta);
     park.update(delta, elapsed);
+    playground.update(elapsed);
     sun.update(delta);
     trees.update(elapsed, sunlight, hemiLight);
     petals.update(delta, elapsed, trees.leafMaterial.uniforms.uSeason.value);
