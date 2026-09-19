@@ -5,8 +5,12 @@ import { loadLeafShaders, createTrees } from "./tree.js";
 import { createPetals } from "./petals.js";
 import { createSun } from "./sun.js";
 import { createPlayground } from "./playground.js";
-// ---------- Scene ----------
+import { setupMusic } from "./music.js";
 
+// ---------- Music ----------
+
+setupMusic();
+// ---------- Scene ----------
 const scene = new THREE.Scene();
 
 const skyColor = new THREE.Color(0xcfe6ee);
