@@ -246,3 +246,106 @@ export function createIronTexture() {
 
     return toTexture(canvas, 1, 1);
 }
+// ---------- Bark (tree trunks) ----------
+
+export function createBarkTexture() {
+    const size = 256;
+    const { canvas, ctx } = makeCanvas(size);
+
+    ctx.fillStyle = "#6b4a32";
+    ctx.fillRect(0, 0, size, size);
+
+    // Dark vertical cracks that wander slightly
+    for (let i = 0; i < 60; i++) {
+        let x = rand(0, size);
+        ctx.strokeStyle = `hsla(${rand(20, 30)}, ${rand(25, 40)}%, ${rand(15, 35)}%, ${rand(0.4, 0.8)})`;
+        ctx.lineWidth = rand(1, 4);
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        for (let y = 0; y <= size; y += 16) {
+            x += rand(-2, 2);
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+
+    // Light ridges between the cracks
+    for (let i = 0; i < 30; i++) {
+        let x = rand(0, size);
+        ctx.strokeStyle = `hsla(30, 25%, ${rand(55, 65)}%, 0.3)`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        for (let y = 0; y <= size; y += 16) {
+            x += rand(-2, 2);
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+
+    return toTexture(canvas, 2, 1);
+}
+
+
+// ---------- Leaves (grayscale detail; the shader adds the color) ----------
+
+export function createLeafTexture() {
+    const size = 256;
+    const { canvas, ctx } = makeCanvas(size);
+
+    ctx.fillStyle = "#a8a8a8";
+    ctx.fillRect(0, 0, size, size);
+
+    // Lots of small leaf shapes in different shades of gray
+    for (let i = 0; i < 900; i++) {
+        const x = rand(0, size);
+        const y = rand(0, size);
+        const angle = rand(0, Math.PI);
+        const length = rand(6, 12);
+        const lightness = rand(55, 95);
+
+        drawWrapped(size, x, y, length, (px, py) => {
+            ctx.save();
+            ctx.translate(px, py);
+            ctx.rotate(angle);
+            ctx.fillStyle = `hsl(0, 0%, ${lightness}%)`;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, length, length * 0.45, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
+        });
+    }
+
+    const texture = toTexture(canvas, 1, 1);
+    texture.colorSpace = THREE.NoColorSpace; // plain brightness data, not a color
+    return texture;
+}
+// ---------- Cherry blossom petal ----------
+
+export function createPetalTexture() {
+    const size = 64;
+    const { canvas, ctx } = makeCanvas(size); // starts fully transparent
+
+    // Pale center fading to pink edges
+    const gradient = ctx.createRadialGradient(32, 40, 2, 32, 36, 30);
+    gradient.addColorStop(0, "#fff0f4");
+    gradient.addColorStop(0.6, "#f7a8c4");
+    gradient.addColorStop(1, "#e67fa6");
+    ctx.fillStyle = gradient;
+
+    // Petal outline with a small notch at the top
+    ctx.beginPath();
+    ctx.moveTo(32, 60);
+    ctx.bezierCurveTo(4, 44, 6, 12, 24, 6);
+    ctx.lineTo(32, 14);
+    ctx.lineTo(40, 6);
+    ctx.bezierCurveTo(58, 12, 60, 44, 32, 60);
+    ctx.fill();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+}
