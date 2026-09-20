@@ -17,22 +17,29 @@ export async function loadLeafShaders() {
 
 export function createTrees(scene, shaders) {
 
-    // One shared leaf material using the custom shaders
-    const leafMaterial = new THREE.ShaderMaterial({
-        vertexShader: shaders.vertexShader,
-        fragmentShader: shaders.fragmentShader,
-        uniforms: {
-            ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog), // fog support
-            uTime: { value: 0 },
-            uSeason: { value: 0 },
-            uLeafTexture: { value: createLeafTexture() },
-            uSunDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
-            uSunColor: { value: new THREE.Color() },
-            uSkyColor: { value: new THREE.Color() },
-            uGroundColor: { value: new THREE.Color() }
-        },
-        fog: true
-    });
+    const leafTexture = createLeafTexture();
+
+    function createLeafMaterial() {
+        return new THREE.ShaderMaterial({
+            vertexShader: shaders.vertexShader,
+            fragmentShader: shaders.fragmentShader,
+            uniforms: {
+                ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog), // fog support
+                uTime: { value: 0 },
+                uSeason: { value: 0 },
+                uLeafTexture: { value: leafTexture },
+                uSunDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+                uSunColor: { value: new THREE.Color() },
+                uSkyColor: { value: new THREE.Color() },
+                uGroundColor: { value: new THREE.Color() },
+
+                // mouse-click color change
+                uClickColor: { value: new THREE.Color(0x66cc66) }, // green
+                uClickMix: { value: 0.0 } // 0 = normal seasonal color, 1 = clicked color
+            },
+            fog: true
+        });
+    }
 
     const barkMaterial = new THREE.MeshStandardMaterial({
         map: createBarkTexture(),
@@ -54,7 +61,6 @@ export function createTrees(scene, shaders) {
     ];
 
     // Tree positions: [x, z, size]
-    // The front-right area is left empty for the playground (Part 4)
     const placements = [
         [-7, -4, 1.1],
         [6.5, -5, 1.0],
@@ -68,8 +74,18 @@ export function createTrees(scene, shaders) {
         [0, -13, 1.1]
     ];
 
+    const leafMaterials = [];
+    const trees = [];
+
     for (const [x, z, size] of placements) {
         const tree = new THREE.Group();
+
+        const leafMaterial = createLeafMaterial();
+        leafMaterials.push(leafMaterial);
+
+        tree.userData.isTree = true;
+        tree.userData.leafMaterial = leafMaterial;
+        tree.userData.colorChanged = false;
 
         const trunk = new THREE.Mesh(trunkGeometry, barkMaterial);
         trunk.position.y = 1.5;
@@ -82,13 +98,28 @@ export function createTrees(scene, shaders) {
             leaves.position.set(bx, by, bz);
             leaves.scale.setScalar(radius);
             leaves.castShadow = true;
+
+            // mark these meshes so raycasting can detect them
+            leaves.userData.isLeaf = true;
+            leaves.userData.treeRef = tree;
+
             tree.add(leaves);
         }
 
         tree.position.set(x, 0, z);
         tree.scale.setScalar(size);
-        tree.rotation.y = Math.random() * Math.PI * 2; // so trees don't look identical
+        tree.rotation.y = Math.random() * Math.PI * 2;
         scene.add(tree);
+        trees.push(tree);
+    }
+
+
+    // ---------- Mouse interaction helper ----------
+
+    function toggleTreeLeafColor(tree) {
+        const material = tree.userData.leafMaterial;
+        tree.userData.colorChanged = !tree.userData.colorChanged;
+        material.uniforms.uClickMix.value = tree.userData.colorChanged ? 1.0 : 0.0;
     }
 
 
@@ -97,22 +128,26 @@ export function createTrees(scene, shaders) {
     const seasonSpeed = 0.05; // 0.05 = one full year every 20 seconds
 
     function update(elapsed, sunlight, hemiLight) {
-        const u = leafMaterial.uniforms;
+        const seasonValue = (elapsed * seasonSpeed) % 1;
 
-        u.uTime.value = elapsed;
-        u.uSeason.value = (elapsed * seasonSpeed) % 1;
+        for (const material of leafMaterials) {
+            const u = material.uniforms;
 
-        // Direction from the scene toward the sun
-        u.uSunDirection.value
-            .copy(sunlight.position)
-            .sub(sunlight.target.position)
-            .normalize();
+            u.uTime.value = elapsed;
+            u.uSeason.value = seasonValue;
 
-        // Light colors multiplied by their brightness
-        u.uSunColor.value.copy(sunlight.color).multiplyScalar(sunlight.intensity);
-        u.uSkyColor.value.copy(hemiLight.color).multiplyScalar(hemiLight.intensity);
-        u.uGroundColor.value.copy(hemiLight.groundColor).multiplyScalar(hemiLight.intensity);
+            // Direction from the scene toward the sun
+            u.uSunDirection.value
+                .copy(sunlight.position)
+                .sub(sunlight.target.position)
+                .normalize();
+
+            // Light colors multiplied by their brightness
+            u.uSunColor.value.copy(sunlight.color).multiplyScalar(sunlight.intensity);
+            u.uSkyColor.value.copy(hemiLight.color).multiplyScalar(hemiLight.intensity);
+            u.uGroundColor.value.copy(hemiLight.groundColor).multiplyScalar(hemiLight.intensity);
+        }
     }
 
-      return { update, leafMaterial, placements };
+    return { update, placements, trees, toggleTreeLeafColor, leafMaterial: leafMaterials[0] };
 }

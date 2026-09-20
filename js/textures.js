@@ -349,6 +349,10 @@ export function createPetalTexture() {
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
 }
+
+
+
+
 // ---------- Sun glow ----------
 
 export function createSunGlowTexture() {

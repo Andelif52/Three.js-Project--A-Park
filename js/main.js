@@ -83,7 +83,81 @@ const playground = createPlayground(scene);
 
 const leafShaders = await loadLeafShaders();
 const trees = createTrees(scene, leafShaders);
-const petals = createPetals(scene, trees.placements);
+
+// ---------- Leaf click interaction ----------
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+let pointerDownX = 0;
+let pointerDownY = 0;
+let dragged = false;
+
+
+renderer.domElement.addEventListener("pointerdown", (event) => {
+
+    pointerDownX = event.clientX;
+    pointerDownY = event.clientY;
+    dragged = false;
+
+});
+
+
+renderer.domElement.addEventListener("pointermove", (event) => {
+
+    const dx = event.clientX - pointerDownX;
+    const dy = event.clientY - pointerDownY;
+
+    if (Math.sqrt(dx * dx + dy * dy) > 5) {
+        dragged = true;
+    }
+
+});
+
+
+renderer.domElement.addEventListener("pointerup", (event) => {
+
+    // Ignore camera dragging
+    if (dragged) return;
+
+
+    const rect = renderer.domElement.getBoundingClientRect();
+
+
+    mouse.x =
+        ((event.clientX - rect.left) / rect.width) * 2 - 1;
+
+    mouse.y =
+        -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+
+    raycaster.setFromCamera(mouse, camera);
+
+
+    const intersects = raycaster.intersectObjects(
+        scene.children,
+        true
+    );
+
+
+    for (const hit of intersects) {
+
+        if (hit.object.userData.isLeaf) {
+
+            const tree = hit.object.userData.treeRef;
+
+            trees.toggleTreeLeafColor(tree);
+
+            break;
+        }
+
+    }
+
+});
+
+
+
+const petals = createPetals(scene, trees.trees);
 // ---------- Sun ----------
 
 const sun = createSun(scene, sunlight, hemiLight);
@@ -107,7 +181,7 @@ function animate() {
     playground.update(elapsed);
     sun.update(delta);
     trees.update(elapsed, sunlight, hemiLight);
-    petals.update(delta, elapsed, trees.leafMaterial.uniforms.uSeason.value);
+    petals.update(delta, elapsed);
     renderer.render(scene, camera);
 }
 

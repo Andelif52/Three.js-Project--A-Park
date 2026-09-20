@@ -5,6 +5,9 @@ uniform vec3 uSunColor;
 uniform vec3 uSkyColor;
 uniform vec3 uGroundColor;
 
+uniform vec3 uClickColor;
+uniform float uClickMix;
+
 varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vWorldPosition;
@@ -13,13 +16,16 @@ varying vec3 vWorldPosition;
 
 // Always light pink
 vec3 seasonColor(float s) {
-    return vec3(0.95, 0.66, 0.78);;
+    return vec3(0.95, 0.66, 0.78);
+    ;
 }
 
 void main() {
     // 1. Season color, slightly different across the canopy
     float variation = sin(vWorldPosition.x * 1.7 + vWorldPosition.z * 1.3 + vWorldPosition.y * 0.9) * 0.04;
     vec3 leafColor = seasonColor(uSeason + variation);
+
+    leafColor = mix(leafColor, uClickColor, uClickMix);
     leafColor = pow(leafColor, vec3(2.2)); // convert to linear so lighting matches other objects
 
     // 2. Leaf detail from the texture
