@@ -4,6 +4,7 @@ import { createGrassTexture, createPathTexture } from "./textures.js";
 import { createWalls } from "./walls.js";
 import { createGate } from "./gate.js";
 import { createPond } from "./pond.js";
+import { createFish } from "./fish.js";
 
 
 // Builds a flat ribbon that follows a curve (used for the path)
@@ -124,7 +125,7 @@ export function createPark(scene) {
     // ---------- Per-frame updates ----------
 
     function update(delta, elapsed) {
-
+        fish.update(delta);
     }
 
     createWalls(scene);
@@ -141,6 +142,8 @@ export function createPark(scene) {
         z: -16,
         scale: 1.3
     });
+
+    const fish = createFish(scene);
 
     return { update, bench };
 }
