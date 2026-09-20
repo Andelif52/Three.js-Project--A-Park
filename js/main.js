@@ -6,6 +6,7 @@ import { createPetals } from "./petals.js";
 import { createSun } from "./sun.js";
 import { createPlayground } from "./playground.js";
 import { setupMusic } from "./music.js";
+import { createPond } from "./pond.js";
 
 // ---------- Music ----------
 
@@ -79,6 +80,7 @@ scene.add(sunlight.target); // the point the sun shines toward (origin)
 
 const park = createPark(scene);
 const playground = createPlayground(scene);
+//const pond = createPond(scene);
 // ---------- Trees ----------
 
 const leafShaders = await loadLeafShaders();
