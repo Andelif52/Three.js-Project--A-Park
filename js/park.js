@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { createBench, createLampPost } from "./bench.js";
 import { createGrassTexture, createPathTexture } from "./textures.js";
+import { createWalls } from "./walls.js";
+import { createGate } from "./gate.js";
 
 
 // Builds a flat ribbon that follows a curve (used for the path)
@@ -51,7 +53,7 @@ export function createPark(scene) {
 
     // ---------- Ground ----------
 
-    const groundSize = 120;
+    const groundSize = 70;
 
     const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(groundSize, groundSize),
@@ -123,6 +125,9 @@ export function createPark(scene) {
     function update(delta, elapsed) {
      
     }
+
+    createWalls(scene);
+    createGate(scene);
 
     return { update, bench};
 }
