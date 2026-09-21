@@ -93,7 +93,7 @@ export function createRoad(scene) {
 
             new THREE.Vector3(-11.50, 0, 16.80),
             new THREE.Vector3(-8.80, 0, 18.90),
-            new THREE.Vector3(-5.01, 0, 19.77)    // End of road position
+            new THREE.Vector3(-4.81, 0, 19.77)    // End of road position
         ],
         false,
         "catmullrom",

@@ -144,7 +144,7 @@ export function createPlayground(scene) {
     // Swing set (mint frame, butter-yellow seats)
     const { swingSet, swings } = createSwingSet(mint, butter, rope);
     swingSet.position.z = -4.5;
-    swingSet.position.x = 2;
+    swingSet.position.z = -4.5;
     playground.add(swingSet);
 
     // Seesaw (coral plank, lavender base and handles)

@@ -8,7 +8,7 @@ import { createPlayground } from "./playground.js";
 import { setupMusic } from "./music.js";
 import { createPond } from "./pond.js";
 import { createRoad } from "./road.js";
-//import { createPositionPicker } from "./positionPicker.js";
+import { createPositionPicker } from "./positionPicker.js";
 
 // ---------- Music ----------
 
@@ -37,7 +37,7 @@ const camera = new THREE.PerspectiveCamera(
     200
 );
 
-camera.position.set(0, 6, 14);
+camera.position.set(0, 10, 50);
 
 
 // ---------- Renderer ----------
@@ -54,11 +54,11 @@ document.body.appendChild(renderer.domElement);
 
 
 
-// createPositionPicker(
-//     scene,
-//     camera,
-//     renderer
-// );
+createPositionPicker(
+    scene,
+    camera,
+    renderer
+);
 
 
 // ---------- Lighting ----------
