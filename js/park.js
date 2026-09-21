@@ -5,7 +5,9 @@ import { createWalls } from "./walls.js";
 import { createGate } from "./gate.js";
 import { createPond } from "./pond.js";
 import { createFish } from "./fish.js";
-
+import { createPlaygroundModels } from "./playgroundModels.js";
+import { createSandArea } from "./sandArea.js";
+import { createPlayground } from "./playground.js";
 
 // Builds a flat ribbon that follows a curve (used for the path)
 function createPathGeometry(curve, width, segments) {
@@ -128,6 +130,13 @@ export function createPark(scene) {
         fish.update(delta);
     }
 
+
+
+
+    
+
+    
+
     createWalls(scene);
     createGate(scene);
 
@@ -144,6 +153,9 @@ export function createPark(scene) {
     });
 
     const fish = createFish(scene);
+
+
+
 
     return { update, bench };
 }

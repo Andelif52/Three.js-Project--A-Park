@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createPaintTexture, createRopeTexture, createPathTexture } from "./textures.js";
+import { createPlaygroundModels } from "./playgroundModels.js";
 
 
 // ---------- Helpers ----------
@@ -49,8 +50,8 @@ function createSwingSet(frameMaterial, seatMaterial, ropeMaterial) {
 
     // A-frame legs at each end
     for (const x of [-halfWidth, halfWidth]) {
-        addCylinder(swingSet, frameMaterial, 0.06, legLength, x, top / 2,  legSpread / 2, -legAngle);
-        addCylinder(swingSet, frameMaterial, 0.06, legLength, x, top / 2, -legSpread / 2,  legAngle);
+        addCylinder(swingSet, frameMaterial, 0.06, legLength, x, top / 2, legSpread / 2, -legAngle);
+        addCylinder(swingSet, frameMaterial, 0.06, legLength, x, top / 2, -legSpread / 2, legAngle);
     }
 
     // Two swings, each hanging from its own pivot at the top beam
@@ -107,7 +108,7 @@ function createSeesaw(plankMaterial, baseMaterial) {
 export function createPlayground(scene) {
 
     const playground = new THREE.Group();
-    playground.position.set(8.5, 0, 6.5); // front-right open area
+    playground.position.set(18, 0, 18); // front-right open area
     playground.rotation.y = -0.7;         // angled toward the bench
     scene.add(playground);
 
@@ -117,9 +118,9 @@ export function createPlayground(scene) {
         roughness: 0.6
     });
 
-    const mint     = paint("#a8dcc9");
-    const butter   = paint("#f6d98b");
-    const coral    = paint("#f4a99a");
+    const mint = paint("#a8dcc9");
+    const butter = paint("#f6d98b");
+    const coral = paint("#f4a99a");
     const lavender = paint("#c7b8e8");
 
     const rope = new THREE.MeshStandardMaterial({
@@ -129,7 +130,7 @@ export function createPlayground(scene) {
 
     // Sandy patch underneath
     const sand = new THREE.Mesh(
-        new THREE.CircleGeometry(4.2, 48),
+        new THREE.CircleGeometry(8, 48),
         new THREE.MeshStandardMaterial({
             map: createPathTexture(3.5, 3.5),
             roughness: 0.95
@@ -142,13 +143,18 @@ export function createPlayground(scene) {
 
     // Swing set (mint frame, butter-yellow seats)
     const { swingSet, swings } = createSwingSet(mint, butter, rope);
-    swingSet.position.z = -1.6;
+    swingSet.position.z = -4.5;
+    swingSet.position.x = 2;
     playground.add(swingSet);
 
     // Seesaw (coral plank, lavender base and handles)
     const { seesaw, plank } = createSeesaw(coral, lavender);
-    seesaw.position.z = 2;
+    seesaw.position.z = 5;
     playground.add(seesaw);
+
+
+    // Imported playground models
+    createPlaygroundModels(playground);
 
 
     // ---------- Per-frame updates ----------

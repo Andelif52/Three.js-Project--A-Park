@@ -7,6 +7,8 @@ import { createSun } from "./sun.js";
 import { createPlayground } from "./playground.js";
 import { setupMusic } from "./music.js";
 import { createPond } from "./pond.js";
+import { createRoad } from "./road.js";
+//import { createPositionPicker } from "./positionPicker.js";
 
 // ---------- Music ----------
 
@@ -17,6 +19,13 @@ const scene = new THREE.Scene();
 const skyColor = new THREE.Color(0xcfe6ee);
 scene.background = skyColor;
 scene.fog = new THREE.Fog(skyColor, 30, 85); // starts fading at 30, fully hidden at 85
+
+// const grid = new THREE.GridHelper(70, 70, 0x444444, 0x888888);
+// grid.position.y = 0.05; // slightly above ground
+// scene.add(grid);
+
+// const axes = new THREE.AxesHelper(5);
+// scene.add(axes);
 
 
 // ---------- Camera ----------
@@ -42,6 +51,14 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 document.body.appendChild(renderer.domElement);
+
+
+
+// createPositionPicker(
+//     scene,
+//     camera,
+//     renderer
+// );
 
 
 // ---------- Lighting ----------
@@ -80,6 +97,7 @@ scene.add(sunlight.target); // the point the sun shines toward (origin)
 
 const park = createPark(scene);
 const playground = createPlayground(scene);
+createRoad(scene);
 //const pond = createPond(scene);
 // ---------- Trees ----------
 
