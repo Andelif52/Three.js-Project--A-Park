@@ -53,10 +53,6 @@ export function createPlaygroundModels(parent) {
 
 
 
-
-
-
-
     // ---------- Swing GLB ----------
 
 
@@ -97,12 +93,6 @@ export function createPlaygroundModels(parent) {
         }
 
     );
-
-
-
-
-
-
 
 
 
@@ -177,7 +167,7 @@ export function createPlaygroundModels(parent) {
                 {
                     x: -4.5,
                     y: 0.1,
-                    z: 3
+                    z: -3
                 },
 
                 0
@@ -192,12 +182,6 @@ export function createPlaygroundModels(parent) {
         }
 
     );
-
-
-
-
-
-
 
 
 
@@ -269,9 +253,9 @@ export function createPlaygroundModels(parent) {
                 2.5,
 
                 {
-                    x: -4,
+                    x: -4.5,
                     y: 0.1,
-                    z: 1
+                    z: -1.5
                 },
 
                 0
