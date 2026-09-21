@@ -31,7 +31,7 @@ export function createSun(scene, sunlight, hemiLight) {
     const sun = {
         progress: 0.15,      // 0 = before sunrise, 1 = after sunset
         dayLength: 60,       // seconds for one full day
-        speedMultiplier: 1,  // changed by the keyboard in Step 2
+        speedMultiplier: 1,  // changed by the keyboard 
         update
     };
 

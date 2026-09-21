@@ -124,6 +124,7 @@ export function createPark(scene) {
     const lamp = createLampPost();
     lamp.position.set(1.9, 0.025, -0.5); // beside the bench, slightly behind
     scene.add(lamp);
+    
     // ---------- Per-frame updates ----------
 
     function update(delta, elapsed) {

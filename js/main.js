@@ -35,22 +35,22 @@ const camera = new THREE.PerspectiveCamera(
     window.innerWidth / window.innerHeight,
     0.1,
     200
-);
+); // fov, aspect, near, far
 
-camera.position.set(0, 10, 50);
+camera.position.set(0, 10, 50); // initial position, will be overridden by controls
 
 
 // ---------- Renderer ----------
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight); // full window size
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // prevents excessive pixel ratio on very high DPI screens
 
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = true; //Enables shadows.
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; //Uses soft shadow filtering.
 
-document.body.appendChild(renderer.domElement);
+document.body.appendChild(renderer.domElement); //Uses soft shadow filtering.
 
 
 
@@ -64,27 +64,27 @@ createPositionPicker(
 // ---------- Lighting ----------
 
 // Soft fill light: sky tone from above, grass tone from below
-const hemiLight = new THREE.HemisphereLight(0xdcefff, 0x5b7a3a, 1.4);
-scene.add(hemiLight);
+const hemiLight = new THREE.HemisphereLight(0xdcefff, 0x5b7a3a, 1.4); // sky color, ground color, intensity
+scene.add(hemiLight); // ambient light from sky and ground
 
 // Sun
-const sunlight = new THREE.DirectionalLight(0xfff0d6, 2.8);
-sunlight.position.set(15, 20, 10);
-sunlight.castShadow = true;
+const sunlight = new THREE.DirectionalLight(0xfff0d6, 2.8); // color, intensity
+sunlight.position.set(15, 20, 10); 
+sunlight.castShadow = true; // enables shadows from the sun
 
-sunlight.shadow.mapSize.set(2048, 2048);
+sunlight.shadow.mapSize.set(2048, 2048); // higher resolution shadow map for better quality shadows
 
-const shadowCam = sunlight.shadow.camera;
-shadowCam.left = -30;
+const shadowCam = sunlight.shadow.camera; // the camera that defines the area where shadows are calculated
+shadowCam.left = -30; // defines the left boundary of the shadow camera's view frustum
 shadowCam.right = 30;
 shadowCam.top = 30;
 shadowCam.bottom = -30;
 shadowCam.near = 1;
 shadowCam.far = 80;
-shadowCam.updateProjectionMatrix();
+shadowCam.updateProjectionMatrix(); // updates the shadow camera's projection matrix after changing its properties
 
 sunlight.shadow.bias = -0.0005;     // prevents stripy "shadow acne"
-sunlight.shadow.normalBias = 0.02;
+sunlight.shadow.normalBias = 0.02;// reduces self-shadowing artifacts on sloped surfaces
 
 scene.add(sunlight);
 scene.add(sunlight.target); // the point the sun shines toward (origin)
@@ -95,19 +95,22 @@ scene.add(sunlight.target); // the point the sun shines toward (origin)
 
 // ---------- Park ----------
 
-const park = createPark(scene);
+const park = createPark(scene); 
 const playground = createPlayground(scene);
 createRoad(scene);
-//const pond = createPond(scene);
+
 // ---------- Trees ----------
 
-const leafShaders = await loadLeafShaders();
-const trees = createTrees(scene, leafShaders);
+const leafShaders = await loadLeafShaders(); // load leaf shaders before creating trees
+const trees = createTrees(scene, leafShaders); 
+
+
+
 
 // ---------- Leaf click interaction ----------
 
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
+const raycaster = new THREE.Raycaster(); // used for detecting mouse clicks on leaves
+const mouse = new THREE.Vector2(); // normalized device coordinates of the mouse click
 
 let pointerDownX = 0;
 let pointerDownY = 0;
@@ -116,9 +119,9 @@ let dragged = false;
 
 renderer.domElement.addEventListener("pointerdown", (event) => {
 
-    pointerDownX = event.clientX;
-    pointerDownY = event.clientY;
-    dragged = false;
+    pointerDownX = event.clientX; // store the initial pointer down position
+    pointerDownY = event.clientY; // store the initial pointer down position
+    dragged = false; // reset dragged flag on pointer down
 
 });
 
@@ -134,32 +137,29 @@ renderer.domElement.addEventListener("pointermove", (event) => {
 
 });
 
-
-renderer.domElement.addEventListener("pointerup", (event) => {
+// ---------- Leaf click interaction For Clicking Tree Leaves ----------
+renderer.domElement.addEventListener("pointerup", (event) => { 
 
     // Ignore camera dragging
     if (dragged) return;
 
 
-    const rect = renderer.domElement.getBoundingClientRect();
+    const rect = renderer.domElement.getBoundingClientRect(); // get the size and position of the canvas relative to the viewport
 
 
-    mouse.x =
-        ((event.clientX - rect.left) / rect.width) * 2 - 1;
-
-    mouse.y =
-        -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1; // convert mouse x position to normalized device coordinates (-1 to +1)
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1; // convert mouse y position to normalized device coordinates (-1 to +1)
 
 
-    raycaster.setFromCamera(mouse, camera);
+    raycaster.setFromCamera(mouse, camera); // update the raycaster to point from the camera through the mouse position
 
-
+    // Check for intersections with objects in the scene
     const intersects = raycaster.intersectObjects(
         scene.children,
         true
     );
 
-
+    // Check if any leaves were clicked
     for (const hit of intersects) {
 
         if (hit.object.userData.isLeaf) {
@@ -177,10 +177,11 @@ renderer.domElement.addEventListener("pointerup", (event) => {
 
 
 
-const petals = createPetals(scene, trees.trees);
+const petals = createPetals(scene, trees.trees); // create petals after trees so they can reference the trees for wind movement
 // ---------- Sun ----------
 
-const sun = createSun(scene, sunlight, hemiLight);
+const sun = createSun(scene, sunlight, hemiLight); // create sun after trees so it can reference the trees for wind movement
+
 // ---------- Controls ----------
 const controls = setupControls(
     camera,
@@ -193,25 +194,25 @@ const controls = setupControls(
 const clock = new THREE.Clock();
 
 function animate() {
-    const delta = Math.min(clock.getDelta(), 0.1);
-    const elapsed = clock.elapsedTime;
+    const delta = Math.min(clock.getDelta(), 0.1); // limit delta to avoid large jumps when switching tabs
+    const elapsed = clock.elapsedTime; // total time since the clock started
 
-    controls.update(delta);
-    park.update(delta, elapsed);
-    playground.update(elapsed);
-    sun.update(delta);
-    trees.update(elapsed, sunlight, hemiLight);
-    petals.update(delta, elapsed);
-    renderer.render(scene, camera);
+    controls.update(delta); // update camera controls (orbit, pan, zoom) based on user input 
+    park.update(delta, elapsed); // update park elements (grass, flowers, etc.) based on elapsed time
+    playground.update(elapsed); // update playground elements (swing, slide, etc.) based on elapsed time
+    sun.update(delta); // update sun position and lighting based on elapsed time
+    trees.update(elapsed, sunlight, hemiLight); // update trees (leaves, branches, etc.) based on elapsed time and lighting
+    petals.update(delta, elapsed); // update petals (falling, wind movement, etc.) based on elapsed time
+    renderer.render(scene, camera); // render the scene from the perspective of the camera
 }
 
-renderer.setAnimationLoop(animate);
+renderer.setAnimationLoop(animate); // use setAnimationLoop for consistent frame rate and VR support
 
 
 // ---------- Resize ----------
 
 window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix(); // update camera projection matrix after changing aspect ratio
     renderer.setSize(window.innerWidth, window.innerHeight);
 });

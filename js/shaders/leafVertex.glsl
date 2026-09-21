@@ -7,7 +7,7 @@ varying vec3 vWorldPosition;
 #include <fog_pars_vertex>
 
 void main() {
-    vUv = uv;
+    vUv = uv; //Texture coordinates
 
     // Normal in world space (used for lighting)
     vNormal = normalize(mat3(modelMatrix) * normal);
