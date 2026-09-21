@@ -340,9 +340,9 @@ export function createPlaygroundModels(parent) {
                 1.7,
 
                 {
-                    x: -5,
+                    x: 0,
                     y: 0,
-                    z: -2
+                    z: 1
                 },
 
                 0
