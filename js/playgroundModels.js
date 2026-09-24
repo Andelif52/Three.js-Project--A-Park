@@ -12,8 +12,6 @@ export function createPlaygroundModels(parent) {
     const textureLoader = new THREE.TextureLoader();
 
 
-
-
     function prepareModel(model, scale, position, rotationY = 0) {
 
 
@@ -50,7 +48,6 @@ export function createPlaygroundModels(parent) {
         parent.add(model);
 
     }
-
 
 
     // ---------- Swing GLB ----------
@@ -94,10 +91,7 @@ export function createPlaygroundModels(parent) {
 
     );
 
-
-
     // ---------- Piramidka GLB ----------
-
 
     loader.load(
 
@@ -183,10 +177,7 @@ export function createPlaygroundModels(parent) {
 
     );
 
-
-
     // ---------- Vedro (bucket) GLB ----------
-
 
     loader.load(
 
@@ -269,7 +260,6 @@ export function createPlaygroundModels(parent) {
         }
 
     );
-
 
     // ---------- Gymnastic Wall Bar GLB ----------
 
@@ -354,12 +344,6 @@ export function createPlaygroundModels(parent) {
         }
 
     );
-
-
-
-
-
-
 
     // ---------- Climbing Frames GLB ----------
 

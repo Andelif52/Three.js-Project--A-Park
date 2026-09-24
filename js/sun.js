@@ -32,6 +32,7 @@ export function createSun(scene, sunlight, hemiLight) {
         progress: 0.15,      // 0 = before sunrise, 1 = after sunset
         dayLength: 60,       // seconds for one full day
         speedMultiplier: 1,  // changed by the keyboard 
+        isNight: false,
         update
     };
 
@@ -48,6 +49,7 @@ export function createSun(scene, sunlight, hemiLight) {
         // Angle along the arc: slightly below the horizon at both ends
         const angle = THREE.MathUtils.lerp(-0.15 * Math.PI, 1.15 * Math.PI, sun.progress);
         const elevation = Math.sin(angle); // -0.45 (below horizon) to 1 (overhead)
+        sun.isNight = elevation < -0.05;
 
         // Direction from the park toward the sun
         direction.set(Math.cos(angle), elevation, 0.45).normalize();

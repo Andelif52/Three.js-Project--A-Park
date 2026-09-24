@@ -92,10 +92,17 @@ scene.add(sunlight.target); // the point the sun shines toward (origin)
 // Uncomment to see the shadow area as a wireframe box while debugging:
 // scene.add(new THREE.CameraHelper(shadowCam));
 
+// ---------- Sun ----------
+
+const sun = createSun(scene, sunlight, hemiLight); // create sun after trees so it can reference the trees for wind movement
+
+
+
+
 
 // ---------- Park ----------
 
-const park = createPark(scene); 
+const park = await createPark(scene, sun); 
 const playground = createPlayground(scene);
 createRoad(scene);
 
@@ -178,9 +185,6 @@ renderer.domElement.addEventListener("pointerup", (event) => {
 
 
 const petals = createPetals(scene, trees.trees); // create petals after trees so they can reference the trees for wind movement
-// ---------- Sun ----------
-
-const sun = createSun(scene, sunlight, hemiLight); // create sun after trees so it can reference the trees for wind movement
 
 // ---------- Controls ----------
 const controls = setupControls(

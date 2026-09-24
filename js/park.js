@@ -1,13 +1,12 @@
 import * as THREE from "three";
-import { createBench, createLampPost } from "./bench.js";
+import { createBench } from "./bench.js";
+import { createLamps } from "./lamp.js";
 import { createGrassTexture, createPathTexture } from "./textures.js";
 import { createWalls } from "./walls.js";
 import { createGate } from "./gate.js";
-import { createPond } from "./pond.js";
+import { createPond, loadWaterShaders } from "./pond.js";
 import { createFish } from "./fish.js";
-import { createPlaygroundModels } from "./playgroundModels.js";
-import { createSandArea } from "./sandArea.js";
-import { createPlayground } from "./playground.js";
+
 
 // Builds a flat ribbon that follows a curve (used for the path)
 function createPathGeometry(curve, width, segments) {
@@ -53,7 +52,7 @@ function createPathGeometry(curve, width, segments) {
 }
 
 
-export function createPark(scene) {
+export async function createPark(scene, sun) {
 
     // ---------- Ground ----------
 
@@ -121,33 +120,30 @@ export function createPark(scene) {
     bench.position.set(0, 0.025, 0); // sitting on the paved circle
     scene.add(bench);
 
-    const lamp = createLampPost();
-    lamp.position.set(1.9, 0.025, -0.5); // beside the bench, slightly behind
-    scene.add(lamp);
-    
-    // ---------- Per-frame updates ----------
-
-    function update(delta, elapsed) {
-        fish.update(delta);
-    }
+    const lamps = createLamps(scene);
 
 
 
 
-    
 
-    
+
+
+
+
 
     createWalls(scene);
     createGate(scene);
 
-    // ponds
-    createPond(scene, {
+    // ---------- Ponds ----------
+
+    const waterShaders = await loadWaterShaders();
+
+    const pond1 = createPond(scene, waterShaders, {
         x: -19,
         z: 19
     });
 
-    createPond(scene, {
+    const pond2 = createPond(scene, waterShaders, {
         x: 20,
         z: -16,
         scale: 1.3
@@ -155,7 +151,14 @@ export function createPark(scene) {
 
     const fish = createFish(scene);
 
+    // ---------- Per-frame updates ----------
 
+    function update(delta, elapsed) {
+        pond1.update(elapsed);
+        pond2.update(elapsed);
+        fish.update(delta);
+        lamps.update(sun.isNight);
+    }
 
 
     return { update, bench };
